@@ -5,6 +5,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DriverService } from './driver/driver.service';
 import { DriverController } from './driver/driver.controller';
 import { Driver } from './entities/driver.entities';
+import { VehicleService } from './vehicle/vehicle.service';
+import { VehicleController } from './vehicle/vehicle.controller';
+import { Vehicle } from './entities/vehicle.entity';
 
 @Module({
   imports: [
@@ -15,12 +18,12 @@ import { Driver } from './entities/driver.entities';
       username: 'postgres',
       password: '123456',
       database: 'postgres',
-      entities: [Driver],
+      entities: [Driver,Vehicle],
       synchronize: true, // set to false in production
     }),
-    TypeOrmModule.forFeature([Driver])
+    TypeOrmModule.forFeature([Driver, Vehicle])
   ],
-  controllers: [AppController, DriverController],
-  providers: [AppService, DriverService],
+  controllers: [AppController, DriverController, VehicleController],
+  providers: [AppService, DriverService, VehicleService],
 })
 export class AppModule {}
