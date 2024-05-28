@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Driver } from './driver.entities';
 
 @Entity()
 export class Vehicle {
@@ -16,4 +17,7 @@ export class Vehicle {
 
   @Column()
   insuranceCertificate: string;
+
+  // @ManyToOne(() => Driver, driver => driver.vehicles)
+  // drivers: Driver[];
 }

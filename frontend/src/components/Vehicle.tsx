@@ -1,5 +1,8 @@
 import { fetchData, postData } from "@/actions/vehicleAction";
+import { fetchDriverData } from "@/actions/driverAction";
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import TransferModal from "./TransferModal";
 
 const Vehicle = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -12,9 +15,10 @@ const Vehicle = () => {
   });
 
   const [transferData, setTransferData] = useState({
-    vehicleNumber: '',
-    driver: ''
+    vehicleNumber: "",
+    driver: "",
   });
+  const [selectedVehicle, setSelectedVehicle] = useState(null)
   const [vehicles, setVehicles] = useState<any[]>([]);
   const fetchAllData = async () => {
     try {
@@ -33,11 +37,13 @@ const Vehicle = () => {
     }));
   };
 
-  const handleTransferChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleTransferChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setTransferData({
       ...transferData,
-      [name]: value
+      [name]: value,
     });
   };
 
@@ -51,18 +57,6 @@ const Vehicle = () => {
     }
   };
 
-  const handleTransferSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      // Handle transfer data submission
-      // For example:
-      // await transferDataApi(transferData);
-      fetchAllData(); // Refresh data after successful submission
-      closeTransferModal();
-    } catch (error) {
-      // Handle error
-    }
-  };
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -72,7 +66,8 @@ const Vehicle = () => {
     setIsModalOpen(false);
   };
 
-  const openTransferModal = () => {
+  const openTransferModal = (vehicle) => {
+   setSelectedVehicle(vehicle)
     setIsTransferModalOpen(true);
   };
 
@@ -88,7 +83,7 @@ const Vehicle = () => {
       <div className="container py-4">
         <button
           id="openModal"
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          className="bg-indigo-400 text-white px-4 py-2 rounded"
           onClick={openModal}
         >
           Create Vehicle
@@ -175,80 +170,42 @@ const Vehicle = () => {
             </tr>
           </thead>
           <tbody>
-              {vehicles.map((row) => {
-                return (
-            <tr>
-
-                
-                    <td className="px-4 py-2 border-b text-center">{row.vehicleNumber}</td>
-                    <td className="px-4 py-2 border-b text-center">{row.vehicleType}</td>
-                    <td className="px-4 py-2 border-b text-center">
-      <button className="bg-red-500 text-white  py-1 px-1 rounded hover:bg-red-700 mr-4">History</button>
-      <button
-                    id="openTransferModal"
-                    className="bg-red-500 text-white py-1 px-1 rounded hover:bg-red-700"
-                    onClick={openTransferModal}
-                  >
-                    Transfer
-                  </button>
-                  {isTransferModalOpen && (
-                    <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center">
-                      <div className="bg-white rounded-lg shadow-lg w-1/3">
-                        <div className="border-b px-4 py-2 flex justify-between items-center">
-                          <h3 className="font-semibold text-lg">Transfer Vehicle</h3>
-                          <button onClick={closeTransferModal} className="text-black">
-                            &times;
-                          </button>
-                        </div>
-                        <form
-                          className="max-w-md mx-auto bg-white p-6 rounded-lg"
-                          onSubmit={handleTransferSubmit}
-                        >
-                          <h2 className="text-2xl font-bold mb-6 text-black">
-                            Vehicle Transfer Form
-                          </h2>
-                          <div className="mb-4">
-                            <label className="text-gray-700">Vehicle Number</label>
-                            <input
-                              type="text"
-                              name="vehicleNumber"
-                              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-black"
-                              value={transferData.vehicleNumber}
-                              onChange={handleTransferChange}
-                              required
-                            />
-                          </div>
-                          <div className="mb-4">
-                            <label className="block text-gray-700">Driver</label>
-                            <select
-                              name="driver"
-                              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-black"
-                              value={transferData.driver}
-                              onChange={handleTransferChange}
-                              required
-                            >
-                              <option value="" disabled>Select a driver</option>
-                              <option value="driver1">Driver 1</option>
-                              <option value="driver2">Driver 2</option>
-                              <option value="driver3">Driver 3</option>
-                            </select>
-                          </div>
-                          <button
-                            type="submit"
-                            className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md"
-                          >
-                            Submit
-                          </button>
-                        </form>
-                      </div>
-                    </div>
-                  )}
-                    </td>
-                  
-            </tr>
-
-                );
-              })}
+            {Array.isArray(vehicles) && vehicles.length > 0 ? (
+              vehicles.map((row) => (
+                <tr key={row.id}>
+                  <td className="px-4 py-2 border-b text-center">
+                    {row.vehicleNumber}
+                  </td>
+                  <td className="px-4 py-2 border-b text-center">
+                    {row.vehicleType}
+                  </td>
+                  <td className="px-4 py-2 border-b text-center">
+                    <Link href={`/vehicletransfer?vehicleid=${row.id}`}>
+                    <button className="bg-red-500 text-white py-1 px-1 rounded hover:bg-red-700 mr-4">
+                      History
+                    </button>
+                    </Link>
+                    
+                    <button
+                      id="openTransferModal"
+                      className="bg-red-500 text-white py-1 px-1 rounded hover:bg-red-700"
+                      onClick={() => openTransferModal(row)}
+                    >
+                      Transfer
+                    </button>
+                    {isTransferModalOpen && (
+                      <TransferModal vehicle={selectedVehicle} closeTransferModal={closeTransferModal}/>
+                    )}
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={3} className="px-4 py-2 border-b text-center">
+                  No vehicles found
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

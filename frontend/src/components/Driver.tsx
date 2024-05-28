@@ -1,25 +1,46 @@
-import React, { useState } from "react";
+import { fetchDriverData, postDriverData } from "@/actions/driverAction";
+import React, { useEffect, useState } from "react";
 
 const Driver = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
-    driverName: '',
-    driverNumber: '',
-    photo: null,
+    name: '',
+    phoneNumber: '',
+    profilePhoto: '',
   });
+  const [driver, setDriver] = useState<any[]>([])
+
+  const fetchAllData = async () => {
+    try {
+      const data: any[] = await fetchDriverData();
+      setDriver(data);
+    } catch (error) {
+      // Handle error
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, files } = e.target;
+    const { name, value} = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: files ? files[0] : value,
+      [name]: value,
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log(formData);
+    try {
+      await postDriverData(formData);
+      fetchAllData(); // Refresh data after successful submission
+     setFormData({
+      name: '',
+      phoneNumber: '',
+      profilePhoto: '',
+    })
+      closeModal();
+    } catch (error) {
+      console.error("Error submitting data:", error);
+    }
   };
 
   const openModal = () => {
@@ -30,12 +51,15 @@ const Driver = () => {
     setIsModalOpen(false);
   };
 
+  useEffect(()=>{
+    fetchAllData()
+  },[])
   return (
     <div className="container mx-auto mt-6">
       <div className="container py-4">
         <button
           id="openModal"
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          className="bg-indigo-400 text-white px-4 py-2 rounded"
           onClick={openModal}
         >
           Create Driver
@@ -60,9 +84,9 @@ const Driver = () => {
                 <label className="block text-gray-700">Name</label>
                 <input
                   type="text"
-                  name="driverName"
+                  name="name"
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-black"
-                  value={formData.driverName}
+                  value={formData.name}
                   onChange={handleChange}
                   required 
                 />
@@ -71,9 +95,9 @@ const Driver = () => {
                 <label className="block text-gray-700">Mobile No</label>
                 <input
                   type="text"
-                  name="driverNumber"
+                  name="phoneNumber"
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-black"
-                  value={formData.driverNumber}
+                  value={formData.phoneNumber}
                   onChange={handleChange}
                   required
                 />
@@ -82,7 +106,7 @@ const Driver = () => {
                 <label className="block text-gray-700">Photo</label>
                 <input
                   type="file"
-                  name="photo"
+                  name="profilePhoto"
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-black"
                   onChange={handleChange}
                   required
@@ -108,11 +132,28 @@ const Driver = () => {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td className="px-4 py-2 border-b">Row 1, Cell 1</td>
-              <td className="px-4 py-2 border-b">Row 1, Cell 2</td>
-              <td className="px-4 py-2 border-b">Row 1, Cell 3</td>
-            </tr>
+          {Array.isArray(driver) && driver.length > 0 ? (
+              driver.map((row) => (
+                <tr key={row.id}>
+                  <td className="px-4 py-2 border-b text-center">{row.name}</td>
+                  <td className="px-4 py-2 border-b text-center">{row.phoneNumber}</td>
+                  <td className="px-4 py-2 border-b text-center">
+                    <button className="bg-red-500 text-white py-1 px-1 rounded hover:bg-red-700 mr-4">Details</button>
+                    <button
+                      id="openTransferModal"
+                      className="bg-red-500 text-white py-1 px-1 rounded hover:bg-red-700"
+                      onClick={openModal} // Modify as needed for driver-specific actions
+                    >
+                      Transfer
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={3} className="px-4 py-2 border-b text-center">No drivers found</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

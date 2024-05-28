@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from 'axios';
 
 const BASE_URL = 'http://localhost:3000'; // Replace with your API base URL
 
-interface VehicleData {
+export interface VehicleData {
   vehicleNumber: string;
   vehicleType: string;
   pucCertificate: string ;
