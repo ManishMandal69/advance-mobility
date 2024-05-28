@@ -7,7 +7,10 @@ interface TransferModalProps {
   vehicle: selectVehicle;
   closeTransferModal: () => void;
 }
-const TransferModal: React.FC<TransferModalProps>  = ({ vehicle, closeTransferModal }) => {
+const TransferModal: React.FC<TransferModalProps> = ({
+  vehicle,
+  closeTransferModal,
+}) => {
   const [driver, setDriver] = useState<DriverData[]>();
   const [selectedDriver, setSelectedDriver] = useState<number | null>(null);
 

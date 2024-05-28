@@ -1,11 +1,6 @@
-import Image from "next/image";
-import { Inter } from "next/font/google";
-import Navbar from "@/components/Navbar";
+import Driver from "@/components/Driver";
 
 
 export default function Home() {
-  return (
-<>sjk</>
-      
-  );
+  return <Driver/>
 }

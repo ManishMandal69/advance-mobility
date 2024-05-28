@@ -1,10 +1,12 @@
 import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
-import { VehicleDriverMapping} from 'src/entities/vehicle_driver_mapping.entity';
+import { VehicleDriverMapping } from 'src/entities/vehicle_driver_mapping.entity';
 import { VehicleTransferService } from './vehicle-transfer.service';
 
 @Controller('vehicle-transfer')
 export class VehicleTransferController {
-  constructor(private readonly vehicleTransferService: VehicleTransferService) {}
+  constructor(
+    private readonly vehicleTransferService: VehicleTransferService,
+  ) {}
 
   @Get()
   findAll(): Promise<VehicleDriverMapping[]> {
@@ -17,8 +19,9 @@ export class VehicleTransferController {
   }
 
   @Post()
-  create(@Body() vehicleTransfer: VehicleDriverMapping): Promise<VehicleDriverMapping> {
-    console.log(vehicleTransfer)
+  create(
+    @Body() vehicleTransfer: VehicleDriverMapping,
+  ): Promise<VehicleDriverMapping> {
     return this.vehicleTransferService.create(vehicleTransfer);
   }
 }

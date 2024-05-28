@@ -5,20 +5,18 @@ import Link from "next/link";
 import TransferModal from "./TransferModal";
 import { convertFileToBase64 } from "./convertToBase64";
 
-
 export interface selectVehicle {
-
   id: number;
-  insuranceCertificate : string; 
-  pucCertificate : string;
-  vehicleNumber : string;
+  insuranceCertificate: string;
+  pucCertificate: string;
+  vehicleNumber: string;
   vehicleType: string;
 }
 const Vehicle = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<selectVehicle>();
-  const [vehicles, setVehicles] = useState<any[]>([]);
+  const [vehicles, setVehicles] = useState<selectVehicle[]>([]);
   const [formData, setFormData] = useState({
     vehicleNumber: "",
     vehicleType: "",
@@ -33,7 +31,6 @@ const Vehicle = () => {
       // Handle error
     }
   };
-
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, files } = e.target;
@@ -68,7 +65,7 @@ const Vehicle = () => {
         pucCertificate: "",
         insuranceCertificate: "",
       });
-      closeModal()
+      closeModal();
     } catch (error) {
       // Handle error
     }

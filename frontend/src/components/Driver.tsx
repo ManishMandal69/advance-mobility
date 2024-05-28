@@ -1,19 +1,23 @@
-import { fetchDriverData, postDriverData } from "@/actions/driverAction";
+import {
+  DriverData,
+  fetchDriverData,
+  postDriverData,
+} from "@/actions/driverAction";
 import React, { useEffect, useState } from "react";
 import { convertFileToBase64 } from "./convertToBase64";
 
 const Driver = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    phoneNumber: '',
-    profilePhoto: '',
+    name: "",
+    phoneNumber: "",
+    profilePhoto: "",
   });
-  const [driver, setDriver] = useState<any[]>([])
+  const [driver, setDriver] = useState<DriverData[]>([]);
 
   const fetchAllData = async () => {
     try {
-      const data: any[] = await fetchDriverData();
+      const data: DriverData[] = await fetchDriverData();
       setDriver(data);
     } catch (error) {
       // Handle error
@@ -42,17 +46,16 @@ const Driver = () => {
     }
   };
 
-
-  const handleSubmit = async(e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await postDriverData(formData);
-      fetchAllData(); 
-     setFormData({
-      name: '',
-      phoneNumber: '',
-      profilePhoto: '',
-    })
+      fetchAllData();
+      setFormData({
+        name: "",
+        phoneNumber: "",
+        profilePhoto: "",
+      });
       closeModal();
     } catch (error) {
       console.error("Error submitting data:", error);
@@ -67,9 +70,9 @@ const Driver = () => {
     setIsModalOpen(false);
   };
 
-  useEffect(()=>{
-    fetchAllData()
-  },[])
+  useEffect(() => {
+    fetchAllData();
+  }, []);
   return (
     <div className="container mx-auto mt-6">
       <div className="container py-4">
@@ -95,7 +98,9 @@ const Driver = () => {
               className="max-w-md mx-auto bg-white p-6 rounded-lg"
               onSubmit={handleSubmit}
             >
-              <h2 className="text-2xl font-bold mb-6 text-black">Driver Form</h2>
+              <h2 className="text-2xl font-bold mb-6 text-black">
+                Driver Form
+              </h2>
               <div className="mb-4">
                 <label className="block text-gray-700">Name</label>
                 <input
@@ -104,7 +109,7 @@ const Driver = () => {
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-black"
                   value={formData.name}
                   onChange={handleChange}
-                  required 
+                  required
                 />
               </div>
               <div className="mb-4">
@@ -112,6 +117,7 @@ const Driver = () => {
                 <input
                   type="text"
                   name="phoneNumber"
+                  pattern="[0-9]{10}"
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-black"
                   value={formData.phoneNumber}
                   onChange={handleChange}
@@ -147,16 +153,20 @@ const Driver = () => {
             </tr>
           </thead>
           <tbody>
-          {Array.isArray(driver) && driver.length > 0 ? (
+            {Array.isArray(driver) && driver.length > 0 ? (
               driver.map((row) => (
                 <tr key={row.id}>
                   <td className="px-4 py-2 border-b text-center">{row.name}</td>
-                  <td className="px-4 py-2 border-b text-center">{row.phoneNumber}</td>
+                  <td className="px-4 py-2 border-b text-center">
+                    {row.phoneNumber}
+                  </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={3} className="px-4 py-2 border-b text-center">No drivers found</td>
+                <td colSpan={3} className="px-4 py-2 border-b text-center">
+                  No drivers found
+                </td>
               </tr>
             )}
           </tbody>

@@ -15,7 +15,7 @@ export class DriverService {
   }
 
   findOne(id: number): Promise<Driver> {
-    return this.driverRepository.findOneBy({id});
+    return this.driverRepository.findOneBy({ id });
   }
 
   create(driver: Driver): Promise<Driver> {

@@ -18,6 +18,4 @@ export class Vehicle {
   @Column()
   insuranceCertificate: string;
 
-  // @ManyToOne(() => Driver, driver => driver.vehicles)
-  // drivers: Driver[];
 }

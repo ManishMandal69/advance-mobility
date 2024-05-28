@@ -18,7 +18,6 @@ export class VehicleController {
 
   @Post()
   create(@Body() vehicle: Vehicle): Promise<Vehicle> {
-    console.log(vehicle)
     return this.vehicleService.create(vehicle);
   }
 

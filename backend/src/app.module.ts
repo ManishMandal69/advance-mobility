@@ -21,12 +21,22 @@ import { VehicleTransferController } from './vehicle-transfer/vehicle-transfer.c
       username: 'postgres',
       password: '123456',
       database: 'postgres',
-      entities: [Driver,Vehicle,VehicleDriverMapping],
+      entities: [Driver, Vehicle, VehicleDriverMapping],
       synchronize: true, // set to false in production
     }),
-    TypeOrmModule.forFeature([Driver, Vehicle, VehicleDriverMapping])
+    TypeOrmModule.forFeature([Driver, Vehicle, VehicleDriverMapping]),
   ],
-  controllers: [AppController, DriverController, VehicleController, VehicleTransferController],
-  providers: [AppService, DriverService, VehicleService, VehicleTransferService],
+  controllers: [
+    AppController,
+    DriverController,
+    VehicleController,
+    VehicleTransferController,
+  ],
+  providers: [
+    AppService,
+    DriverService,
+    VehicleService,
+    VehicleTransferService,
+  ],
 })
 export class AppModule {}

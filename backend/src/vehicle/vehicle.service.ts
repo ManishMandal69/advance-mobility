@@ -15,7 +15,7 @@ export class VehicleService {
   }
 
   findOne(id: number): Promise<Vehicle> {
-    return this.vehicleRepository.findOneBy({id});
+    return this.vehicleRepository.findOneBy({ id });
   }
 
   create(vehicle: Vehicle): Promise<Vehicle> {
