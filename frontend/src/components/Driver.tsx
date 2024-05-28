@@ -1,5 +1,6 @@
 import { fetchDriverData, postDriverData } from "@/actions/driverAction";
 import React, { useEffect, useState } from "react";
+import { convertFileToBase64 } from "./convertToBase64";
 
 const Driver = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,19 +20,34 @@ const Driver = () => {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value} = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, files } = e.target;
+    if (files) {
+      const file = files[0];
+      const maxSizeInBytes = 2 * 1024 * 1024; // 2MB
+      if (file.size > maxSizeInBytes) {
+        alert("File size exceeds the limit of 2MB.");
+        return;
+      }
+      const base64 = await convertFileToBase64(file);
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: base64,
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
   };
+
 
   const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
     try {
       await postDriverData(formData);
-      fetchAllData(); // Refresh data after successful submission
+      fetchAllData(); 
      setFormData({
       name: '',
       phoneNumber: '',
@@ -128,7 +144,6 @@ const Driver = () => {
             <tr>
               <th className="px-4 py-2 border-b">Name</th>
               <th className="px-4 py-2 border-b">Mobile Number</th>
-              <th className="px-4 py-2 border-b">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -137,16 +152,6 @@ const Driver = () => {
                 <tr key={row.id}>
                   <td className="px-4 py-2 border-b text-center">{row.name}</td>
                   <td className="px-4 py-2 border-b text-center">{row.phoneNumber}</td>
-                  <td className="px-4 py-2 border-b text-center">
-                    <button className="bg-red-500 text-white py-1 px-1 rounded hover:bg-red-700 mr-4">Details</button>
-                    <button
-                      id="openTransferModal"
-                      className="bg-red-500 text-white py-1 px-1 rounded hover:bg-red-700"
-                      onClick={openModal} // Modify as needed for driver-specific actions
-                    >
-                      Transfer
-                    </button>
-                  </td>
                 </tr>
               ))
             ) : (

@@ -1,10 +1,15 @@
 import { DriverData, fetchDriverData } from "@/actions/driverAction";
 import { postTransferData } from "@/actions/transferAction";
 import React, { useEffect, useState } from "react";
+import { selectVehicle } from "./Vehicle";
 
-const TransferModal = ({ vehicle, closeTransferModal }) => {
+interface TransferModalProps {
+  vehicle: selectVehicle;
+  closeTransferModal: () => void;
+}
+const TransferModal: React.FC<TransferModalProps>  = ({ vehicle, closeTransferModal }) => {
   const [driver, setDriver] = useState<DriverData[]>();
-  const [selectedDriver, setSelectedDriver] = useState(null);
+  const [selectedDriver, setSelectedDriver] = useState<number | null>(null);
 
   const fetchDriver = async () => {
     try {
@@ -60,7 +65,7 @@ const TransferModal = ({ vehicle, closeTransferModal }) => {
                 name="driver"
                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-black"
                 value={selectedDriver ? selectedDriver : -1}
-                onChange={(e) => setSelectedDriver(e.target.value)}
+                onChange={(e) => setSelectedDriver(Number(e.target.value))}
                 required
               >
                 <option value={-1} disabled selected>

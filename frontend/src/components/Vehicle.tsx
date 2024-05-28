@@ -3,48 +3,58 @@ import { fetchDriverData } from "@/actions/driverAction";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import TransferModal from "./TransferModal";
+import { convertFileToBase64 } from "./convertToBase64";
 
+
+export interface selectVehicle {
+
+  id: number;
+  insuranceCertificate : string; 
+  pucCertificate : string;
+  vehicleNumber : string;
+  vehicleType: string;
+}
 const Vehicle = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+  const [selectedVehicle, setSelectedVehicle] = useState<selectVehicle>();
+  const [vehicles, setVehicles] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     vehicleNumber: "",
     vehicleType: "",
     pucCertificate: "",
     insuranceCertificate: "",
   });
-
-  const [transferData, setTransferData] = useState({
-    vehicleNumber: "",
-    driver: "",
-  });
-  const [selectedVehicle, setSelectedVehicle] = useState(null)
-  const [vehicles, setVehicles] = useState<any[]>([]);
   const fetchAllData = async () => {
     try {
-      const data: any[] = await fetchData();
+      const data: selectVehicle[] = await fetchData();
       setVehicles(data);
     } catch (error) {
       // Handle error
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, files } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: files ? files[0] : value,
-    }));
-  };
 
-  const handleTransferChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setTransferData({
-      ...transferData,
-      [name]: value,
-    });
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, files } = e.target;
+    if (files) {
+      const file = files[0];
+      const maxSizeInBytes = 2 * 1024 * 1024;
+      if (file.size > maxSizeInBytes) {
+        alert("File size exceeds the limit of 2MB.");
+        return;
+      }
+      const base64 = await convertFileToBase64(file);
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: base64,
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -52,11 +62,17 @@ const Vehicle = () => {
     try {
       await postData(formData);
       fetchAllData(); // Refresh data after successful submission
+      setFormData({
+        vehicleNumber: "",
+        vehicleType: "",
+        pucCertificate: "",
+        insuranceCertificate: "",
+      });
+      closeModal()
     } catch (error) {
       // Handle error
     }
   };
-
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -66,14 +82,15 @@ const Vehicle = () => {
     setIsModalOpen(false);
   };
 
-  const openTransferModal = (vehicle) => {
-   setSelectedVehicle(vehicle)
+  const openTransferModal = (vehicle: selectVehicle) => {
+    setSelectedVehicle(vehicle);
     setIsTransferModalOpen(true);
   };
 
   const closeTransferModal = () => {
     setIsTransferModalOpen(false);
   };
+
   useEffect(() => {
     fetchAllData();
   }, []);
@@ -131,7 +148,7 @@ const Vehicle = () => {
               <div className="mb-4">
                 <label className="block text-gray-700">PUC Certificate</label>
                 <input
-                  type="text"
+                  type="file"
                   name="pucCertificate"
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-black"
                   onChange={handleChange}
@@ -143,7 +160,7 @@ const Vehicle = () => {
                   Insurance Certificate
                 </label>
                 <input
-                  type=""
+                  type="file"
                   name="insuranceCertificate"
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-black"
                   onChange={handleChange}
@@ -181,11 +198,11 @@ const Vehicle = () => {
                   </td>
                   <td className="px-4 py-2 border-b text-center">
                     <Link href={`/vehicletransfer?vehicleid=${row.id}`}>
-                    <button className="bg-red-500 text-white py-1 px-1 rounded hover:bg-red-700 mr-4">
-                      History
-                    </button>
+                      <button className="bg-red-500 text-white py-1 px-1 rounded hover:bg-red-700 mr-4">
+                        History
+                      </button>
                     </Link>
-                    
+
                     <button
                       id="openTransferModal"
                       className="bg-red-500 text-white py-1 px-1 rounded hover:bg-red-700"
@@ -193,8 +210,11 @@ const Vehicle = () => {
                     >
                       Transfer
                     </button>
-                    {isTransferModalOpen && (
-                      <TransferModal vehicle={selectedVehicle} closeTransferModal={closeTransferModal}/>
+                    {isTransferModalOpen && selectedVehicle && (
+                      <TransferModal
+                        vehicle={selectedVehicle}
+                        closeTransferModal={closeTransferModal}
+                      />
                     )}
                   </td>
                 </tr>
